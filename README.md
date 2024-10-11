@@ -1,6 +1,6 @@
-<div align="center" width="100%">
-    <img src="https://avatars.githubusercontent.com/u/81272306?v=4" width="128" alt="" />
-    <img src="./logo/espresso.png" width="128" alt="" />
+<div align="center" text-align="center" width="100%">
+    <img src="./logo/imperator.png"  alt="" height=30/>
+    <img src="./logo/espresso.png" alt="" height=30 />
 </div>
 
 # Espresso All in One Repository
@@ -15,13 +15,12 @@ Please navigate to each folder to find how to use and customize it.
 
 # Motivation
 - We are the builder, blockchain addict and we love to contribute back to Espresso community
-- We are growing and learning a lot
+- We are growing and learning a lot.
+
 If you love this project, please consider giving it a ⭐.
 
 # Discussion / Ask for Help
 Feel free to create a github issue to discussion your thought. Our team will try to support as much as we can
 
-# TODO
-- [ ] Support multiple public clouds (GCP, Azure)
-- [ ] Better dashboard, better alerts threshold
-- [ ] Cost estimation
+
+# About us
