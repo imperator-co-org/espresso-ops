@@ -1,5 +1,5 @@
 <div align="center" text-align="center" width="100%">
-    <img background="white" src="./logo/imperator.png"  alt="" height=30/>
+    <img src="./logo/imperator.png"  alt="" height=30/>
     <img src="./logo/espresso.png" alt="" height=30 />
 </div>
 
