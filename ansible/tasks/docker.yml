@@ -1,0 +1,61 @@
+---
+- name: Ensure apt cache is up to date (for Debian/Ubuntu systems)
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+
+- name: Install required packages for Docker
+  ansible.builtin.apt:
+    name: 
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install Docker
+  ansible.builtin.apt:
+    name: docker-ce
+    state: latest
+  when: ansible_os_family == "Debian"
+
+- name: Create /etc/docker directory if it doesn't exist
+  ansible.builtin.file:
+    path: /etc/docker
+    state: directory
+    mode: '0755'
+
+- name: Add logging configuration to Docker daemon.json
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+        "log-driver": "{{ docker_log_driver }}",
+        "log-opts": {
+          "{{ docker_log_opt_key }}": "{{ docker_log_opt_value }}"
+        }
+      }
+    mode: '0644'
+    owner: root
+    group: root
+  notify: Restart Docker
+
+- name: Ensure Docker service is running
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes

@@ -1,0 +1,127 @@
+module "vpc_mumbai" {
+  source   = "modules/aws/vpc"
+  region   = "ap-south-1"
+  project  = "espresso"
+  env      = "testnet"
+  vpc_cidr = "10.0.0.0/16"
+  public_subnets = [
+    {
+      zone = "a"
+      cidr = "10.0.0.0/24"
+    },
+    {
+      zone = "b"
+      cidr = "10.0.1.0/24"
+    },
+    {
+      zone = "c"
+      cidr = "10.0.2.0/24"
+    }
+  ]
+}
+
+locals {
+  regular_node_subnets = {
+    0 = module.vpc_mumbai.public_subnets["a"]
+    1 = module.vpc_mumbai.public_subnets["b"]
+    2 = module.vpc_mumbai.public_subnets["c"]
+  }
+
+  custom_fw_rules = [
+    # Cadvisor
+    {
+      from_port   = 8080
+      to_port     = 8080
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    # Prometheus
+    {
+      from_port   = 9100
+      to_port     = 9100
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ]
+}
+
+module "da_node" {
+  source           = "../../modules/aws/ec2"
+  region           = "ap-south-1"
+  project          = "espresso"
+  env              = "testnet"
+  vpc_id           = module.vpc_mumbai.vpc_id
+  instance_name    = "da-node"
+  instance_type    = "r6a.xlarge"
+  use_eip          = true
+  subnet_id        = module.vpc_mumbai.public_subnets["a"]
+  create_data_disk = true
+  data_disk_size   = 500
+  inbound_ip_rules = concat(local.custom_fw_rules, [
+    {
+      from_port   = 7000
+      to_port     = 7000
+      protocol    = "udp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      from_port   = 7000
+      to_port     = 7000
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      from_port   = 22001
+      to_port     = 22001
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ])
+}
+
+module "regular_nodes" {
+  count            = 3
+  source           = "modules/aws/ec2"
+  region           = "ap-south-1"
+  project          = "espresso"
+  env              = "testnet"
+  vpc_id           = module.vpc_mumbai.vpc_id
+  instance_name    = "regular-node-${count.index}"
+  instance_type    = "r6a.xlarge"
+  use_eip          = true
+  subnet_id        = local.regular_node_subnets[count.index]
+  create_data_disk = false
+  root_disk_size   = 30
+  inbound_ip_rules = concat(local.custom_fw_rules, [
+    {
+      from_port   = 7000
+      to_port     = 7000
+      protocol    = "udp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      from_port   = 7000
+      to_port     = 7000
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      from_port   = 22001
+      to_port     = 22001
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ])
+}

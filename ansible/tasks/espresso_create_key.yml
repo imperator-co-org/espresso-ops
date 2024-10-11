@@ -1,0 +1,10 @@
+---
+- name: Generate key
+  shell: docker run --rm ghcr.io/espressosystems/espresso-sequencer/sequencer:20240913 bash -c "keygen -o . && cat 0.env"
+  register: key_output
+
+- name: Save the key to playbook location
+  local_action:
+    module: copy
+    content: "{{ key_output.stdout }}"
+    dest: ./{{ inventory_hostname }}.key

@@ -1,0 +1,51 @@
+---
+
+- name: Setup service folder
+  ansible.builtin.file:
+   path: /{{ ansible_user }}/{{folder}}
+   state: directory
+
+- name: Copy env to host 
+  become: true
+  template:
+    src: '.env.j2'
+    dest: '/{{ ansible_user }}/{{folder}}/.env'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0644'
+
+- name: Copy docker-compose.yml to host 
+  become: true
+  template:
+    src: 'docker-compose.yml.j2'
+    dest: '/{{ ansible_user }}/{{folder}}/docker-compose.yml'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0644'
+
+- name: Setup important volume folders
+  ansible.builtin.file:
+   path: "/{{ ansible_user }}/{{folder}}/{{item}}"
+   state: directory
+  loop:
+   - "volumes"
+   - "volumes/chain"
+   - "volumes/chain/keys"
+   - "volumes/chain/store"
+
+- name: Setup database folder
+  ansible.builtin.file:
+   path: /{{ ansible_user }}/{{folder}}/volumes/postgres
+   state: directory
+  when: use_local_db is defined and use_local_db == true
+
+- name: Copy key if it does not exist
+  copy:
+    dest: "/{{ ansible_user }}/{{folder}}/volumes/chain/keys/0.env"
+    content: "{{ espresso_sequencer_key }}"
+
+- name: Launch docker compose up recreate
+  ansible.builtin.shell:
+    cmd: docker compose up -d --build --force-recreate --remove-orphans
+    chdir: '/{{ ansible_user }}/{{folder}}'
+  ignore_errors: true

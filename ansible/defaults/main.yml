@@ -1,0 +1,75 @@
+# Docker image info
+node_version: 20240925-patch1
+
+espresso_sequencer_api_port: 80
+espresso_sequencer_hotshot_event_streaming_api_port: 22001
+espresso_sequencer_libp2p_port: 7000
+use_local_db: true
+espresso_role:
+  lightweight:
+    command: sequencer -- http -- catchup -- status
+    env:
+      ESPRESSO_SEQUENCER_ORCHESTRATOR_URL: https://orchestrator-UZAFTUIMZOT.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_CDN_ENDPOINT: cdn.decaf.testnet.espresso.network:1737
+      ESPRESSO_STATE_RELAY_SERVER_URL: https://state-relay.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_GENESIS_FILE: /genesis/decaf.toml
+      RUST_LOG: "warn,libp2p=off"
+      RUST_LOG_FORMAT: "json"
+      ESPRESSO_SEQUENCER_STATE_PEERS: https://query.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_L1_PROVIDER: https://go.getblock.io/1454992412334bb09d5d8282d000fb1c 
+      ESPRESSO_SEQUENCER_API_PORT: "{{ espresso_sequencer_api_port }}"
+      ESPRESSO_SEQUENCER_LIBP2P_BIND_ADDRESS: 0.0.0.0:{{ espresso_sequencer_libp2p_port }}
+      ESPRESSO_SEQUENCER_LIBP2P_ADVERTISE_ADDRESS: "{{ ip_addr }}:{{ espresso_sequencer_libp2p_port }}"
+      ESPRESSO_SEQUENCER_STORAGE_PATH: "/root/{{folder}}/store"
+      ESPRESSO_SEQUENCER_KEY_FILE: "/root/{{folder}}/keys/0.env"
+  da:
+    command: sequencer -- storage-sql -- http -- catchup -- status -- query
+    env:
+      ESPRESSO_SEQUENCER_ORCHESTRATOR_URL: https://orchestrator-UZAFTUIMZOT.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_CDN_ENDPOINT: cdn.decaf.testnet.espresso.network:1737
+      ESPRESSO_STATE_RELAY_SERVER_URL: https://state-relay.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_GENESIS_FILE: /genesis/decaf.toml
+      ESPRESSO_SEQUENCER_POSTGRES_PRUNE: "true"
+      ESPRESSO_SEQUENCER_IS_DA: "true"
+      RUST_LOG: "warn,libp2p=off"
+      RUST_LOG_FORMAT: "json"
+      ESPRESSO_SEQUENCER_STATE_PEERS: https://query.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_API_PEERS: https://query.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_L1_PROVIDER: https://go.getblock.io/1454992412334bb09d5d8282d000fb1c 
+      ESPRESSO_SEQUENCER_API_PORT: "{{ espresso_sequencer_api_port }}"
+      ESPRESSO_SEQUENCER_LIBP2P_BIND_ADDRESS: 0.0.0.0:{{ espresso_sequencer_libp2p_port }}
+      ESPRESSO_SEQUENCER_LIBP2P_ADVERTISE_ADDRESS: "{{ ip_addr }}:{{ espresso_sequencer_libp2p_port }}"
+      ESPRESSO_SEQUENCER_STORAGE_PATH: "/root/{{folder}}/store"
+      ESPRESSO_SEQUENCER_KEY_FILE: "/root/{{folder}}/keys/0.env"
+      ESPRESSO_SEQUENCER_POSTGRES_HOST: sequencer-db
+      ESPRESSO_SEQUENCER_POSTGRES_USER: root
+      ESPRESSO_SEQUENCER_POSTGRES_PASSWORD: password
+      ESPRESSO_SEQUENCER_POSTGRES_DATABASE: sequencer
+  archival:
+    command: sequencer -- storage-sql -- http -- catchup -- status -- query -- state
+    env:
+      ESPRESSO_SEQUENCER_ORCHESTRATOR_URL: https://orchestrator-UZAFTUIMZOT.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_CDN_ENDPOINT: cdn.decaf.testnet.espresso.network:1737
+      ESPRESSO_STATE_RELAY_SERVER_URL: https://state-relay.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_GENESIS_FILE: /genesis/decaf.toml
+      ESPRESSO_SEQUENCER_IS_DA: true
+      ESPRESSO_SEQUENCER_ARCHIVE: true
+      RUST_LOG: "warn,libp2p=off"
+      RUST_LOG_FORMAT: "json"
+      ESPRESSO_SEQUENCER_STATE_PEERS: https://query.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_API_PEERS: https://query.decaf.testnet.espresso.network
+      ESPRESSO_SEQUENCER_L1_PROVIDER: https://go.getblock.io/1454992412334bb09d5d8282d000fb1c 
+      ESPRESSO_SEQUENCER_API_PORT: "{{ espresso_sequencer_api_port }}"
+      ESPRESSO_SEQUENCER_LIBP2P_BIND_ADDRESS: 0.0.0.0:{{ espresso_sequencer_libp2p_port }}
+      ESPRESSO_SEQUENCER_LIBP2P_ADVERTISE_ADDRESS: "{{ ip_addr }}:{{ espresso_sequencer_libp2p_port }}"
+      ESPRESSO_SEQUENCER_STORAGE_PATH: "/root/{{folder}}/store"
+      ESPRESSO_SEQUENCER_KEY_FILE: "/root/{{folder}}/keys/0.env"
+      ESPRESSO_SEQUENCER_POSTGRES_HOST: sequencer-db
+      ESPRESSO_SEQUENCER_POSTGRES_USER: root
+      ESPRESSO_SEQUENCER_POSTGRES_PASSWORD: password
+      ESPRESSO_SEQUENCER_POSTGRES_DATABASE: sequencer
+
+# Docker driver config
+docker_log_driver: "json-file"   # Default log driver
+docker_log_opt_key: "max-size"   # Example log option key
+docker_log_opt_value: "10m" 

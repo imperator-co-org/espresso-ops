@@ -1,0 +1,3 @@
+---
+- name: Main yml file to manage Espresso
+  include_tasks: espresso_{{ espresso_mode }}.yml

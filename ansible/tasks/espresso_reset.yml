@@ -1,0 +1,16 @@
+---
+- name: Stop the espresso stack
+  ansible.builtin.shell:
+    cmd: docker compose down --remove-orphans -v 
+    chdir: '/{{ ansible_user }}/{{folder}}'
+  ignore_errors: true
+
+- name: Remove local postgress database if it is da node
+  file:
+    path: '/{{ ansible_user }}/{{folder}}/volumes/postgres'
+    state: absent
+  when: use_local_db is defined and use_local_db and (role == "da" or role == "archival") 
+
+- name: Remove chain folder
+  file:
+    path: '/{{ ansible_user }}/{{folder}}/volumes/chain'

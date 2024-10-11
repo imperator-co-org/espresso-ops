@@ -1,0 +1,14 @@
+---
+- name: Install common packages for debugging
+  become: true
+  ansible.builtin.apt: 
+    name: 
+      - jq 
+      - wget 
+      - curl
+    state: present
+
+- name: Install docker
+  ansible.builtin.include_tasks: docker.yml
+  vars:
+    ansible_become: true

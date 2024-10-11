@@ -1,0 +1,50 @@
+services:
+  sequencer:
+    image: ghcr.io/espressosystems/espresso-sequencer/sequencer:{{ node_version }}
+    ports:
+      - "$ESPRESSO_SEQUENCER_API_PORT:$ESPRESSO_SEQUENCER_API_PORT"
+      - "$ESPRESSO_SEQUENCER_HOTSHOT_EVENT_STREAMING_API_PORT:$ESPRESSO_SEQUENCER_HOTSHOT_EVENT_STREAMING_API_PORT"
+      - "$ESPRESSO_DEMO_SEQUENCER_LIBP2P_PORT:$ESPRESSO_DEMO_SEQUENCER_LIBP2P_PORT"
+    restart: always
+    command: {{ espresso_role[role]["command"] }}
+    environment:
+{% for key, value in espresso_role[role]["env"].items()  %}
+      - {{ key }}={{ value }}
+{% endfor %}
+    volumes:
+      - {{chain_name}}_volume:/root/{{folder}}
+{% if use_local_db is defined and use_local_db and (role == "da" or role == "archival") %}
+  sequencer-db:
+    image: postgres
+    user: root
+    ports:
+      - "$ESPRESSO_SEQUENCER_DB_PORT:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=root
+      - POSTGRES_DB=sequencer
+    healthcheck:
+      # Postgres can be falsely "ready" once before running init scripts.
+      # See https://github.com/docker-library/postgres/issues/146 for discussion.
+      test: "pg_isready -U root -d sequencer && sleep 1 && pg_isready -U root -d sequencer"
+      interval: 5s
+      timeout: 4s
+      retries: 20
+    volumes:
+      - {{chain_name}}_db_volume:/data/postgres
+{% endif %}
+volumes:
+  {{chain_name}}_volume:
+    driver: local
+    driver_opts:
+      type: none
+      device: /root/.{{service_name}}/volumes/chain
+      o: bind
+{% if use_local_db is defined and use_local_db and (role == "da" or role == "archival") %}
+  {{chain_name}}_db_volume:
+    driver: local
+    driver_opts:
+      type: none
+      device: /root/.{{service_name}}/volumes/postgres
+      o: bind
+{% endif %}
