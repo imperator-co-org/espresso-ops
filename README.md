@@ -24,3 +24,11 @@ Feel free to create a github issue to discussion your thought. Our team will try
 
 
 # About us
+
+We are [Imperator.co](https://imperator.co), a leading blockchain infrastructure-as-a-service provider specializing in Proof-of-Stake (PoS) validation and advanced data solutions. Our team brings a wealth of expertise to the ecosystem, offering a full range of services from PoS validation to custom data engineering, tailored RPC nodes, APIs and Whitelabel solutions.
+
+With a proven track record of safeguarding over $300M in assets across 50+ blockchains, we proudly serve both institutional and retail users with unwavering reliability, backed by a Service Level Agreement (SLA) ensuring 99.9% uptime. Our clients include industry leaders like Osmosis, Axelar, and CoinGecko, and we are committed to supporting the growth and security of decentralized networks.
+
+This public repository is a contribution to the ecosystem, reflecting our dedication to advancing blockchain technology through open collaboration, security, and efficiency. Our small yet agile team continues to push boundaries to ensure client success and the sustainability of blockchain infrastructure.
+
+
